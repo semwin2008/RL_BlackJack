@@ -6,7 +6,6 @@ class Agent(nn.Module):
         super().__init__()
 
         self.network = nn.Sequential(
-            # nn.InstanceNorm1d(1),
             nn.Linear(1, 2),
         )
         self.activ = nn.Sigmoid()

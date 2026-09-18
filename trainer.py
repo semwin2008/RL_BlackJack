@@ -22,7 +22,7 @@ class Trainer():
         print('Agent instance created')
         
         # creating optimizer
-        self.optim = torch.optim.AdamW(self.agent.parameters(), lr=float(self.config['train']['lr']))
+        self.optim = torch.optim.SGD(self.agent.parameters(), lr=float(self.config['train']['lr']))
         print('Agent optimizer created')
 
         # creating environment instance
