@@ -13,3 +13,19 @@ class Agent(nn.Module):
 
     def act(self, state):
         return self.forward(state)
+
+
+class RandomAgent():
+    def __init__(self,):
+        pass
+
+    def act(self, state):
+        return torch.random.randint(1, 2, (1,))
+
+
+class AlgoAgent():
+    def __init__(self,):
+        pass
+
+    def act(self, state):
+        pass

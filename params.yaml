@@ -3,9 +3,13 @@ agent:
 
 env:
   type: "default"
+  threshold: 21
+  max_value: 10
 
 train:
   num_epochs: 10
   num_steps: 128
+  lr: 1e-4
 
-random_seed: 67
+valid:
+  num_steps: 128
