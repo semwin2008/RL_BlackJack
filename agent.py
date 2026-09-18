@@ -28,4 +28,6 @@ class AlgoAgent():
         pass
 
     def act(self, state):
-        pass
+        if state < 18:
+            return 1
+        return 0

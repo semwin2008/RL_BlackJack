@@ -49,8 +49,7 @@ class Trainer():
         self.optim.step()
         self.optim.zero_grad()
 
-    def validate(self,) -> float:
-        test_agent = RandomAgent()
+    def validate(self, test_agent) -> float:
         test_env = Environment()
 
         num_steps = self.config['valid']['num_steps']
@@ -80,8 +79,10 @@ class Trainer():
                 sum_reward += reward_a + reward_b
 
             # Validation
-            test_score = validate()
-            self.log('Random | Mean Rew', test_score)
+            random_score = validate(RandomAgent())
+            algo_score = validate(AlgoAgent())
+            self.log('Random | Mean Rew', random_score)
+            self.log('Algo | Mean Rew', algo_score)
 
             # Logging
             print(f'Epoch [{epoch:{len(str(num_epochs))}}/{num_epochs}] ended')
