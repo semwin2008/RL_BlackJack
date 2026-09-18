@@ -8,8 +8,8 @@ env:
 
 train:
   num_epochs: 5000
-  num_steps: 128
+  num_steps: 256
   lr: 1e-4
 
 valid:
-  num_steps: 128
+  num_steps: 1024

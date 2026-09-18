@@ -6,12 +6,16 @@ class Agent(nn.Module):
         super().__init__()
 
         self.network = nn.Sequential(
-            nn.Linear(1, 2),
+            nn.Linear(1, 64),
+            nn.LeakyReLU(inplace=True),
+            nn.Linear(64, 64),
+            nn.LeakyReLU(inplace=True),
+            nn.Linear(64, 2),
         )
         self.activ = nn.Softmax(dim=-1)
 
     def forward(self, x):
-        return self.activ(self.network(x))
+        return self.activ(self.network(x / 21))
 
     def act(self, state):
         return torch.multinomial(self.forward(state), 1)
