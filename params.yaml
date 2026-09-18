@@ -7,7 +7,7 @@ env:
   max_value: 10
 
 train:
-  num_epochs: 10
+  num_epochs: 5000
   num_steps: 128
   lr: 1e-4
 

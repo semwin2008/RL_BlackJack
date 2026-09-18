@@ -43,12 +43,7 @@ class Trainer():
         loss = 0
         for state, action, reward in data:
             probs = torch.log(self.agent(state))
-            logit = torch.zeros_like(probs)
-            logit[action] = reward
-            loss += torch.sum(probs * logit)
-        loss.backward()
-        self.optim.step()
-        self.optim.zero_grad()
+
 
     def validate(self, test_agent) -> float:
         test_env = Environment()
@@ -65,19 +60,32 @@ class Trainer():
 
     def train(self,):
         num_epochs = self.config['train']['num_epochs']
+        test_agent = AlgoAgent()
         for epoch in range(num_epochs):
-            buffer = []
             sum_reward = 0
             num_steps = self.config['train']['num_steps']
 
-            # Experience loop
+            # Training loop
+            loss = 0
             for step in range(num_steps):
                 state_a, state_b = self.env.get_state()
-                action_a, action_b = self.agent.act(state_a), self.agent.act(state_b)
+                
+                # getting action predictions
+                probs_a, action_b = self.agent(state_a), test_agent.act(state_b)
+                logit_a = torch.zeros_like(probs_a)
+                action_a = torch.argmax(probs_a)
+
+                # acting
                 reward_a, reward_b = self.env.reflect(action_a, action_b)
-                buffer.append((state_a, action_a, reward_a))
-                buffer.append((state_b, action_b, reward_b))
-                sum_reward += reward_a + reward_b
+                
+                # computing loss
+                logit_a[action_a] = reward_a
+                loss += torch.sum(-probs_a * logit_a)
+
+            loss = loss / num_steps
+            loss.backward()
+            self.optim.step()
+            self.optim.zero_grad()
 
             # Validation
             random_score = self.validate(RandomAgent())
@@ -86,11 +94,9 @@ class Trainer():
             self.log('Algo | Mean Rew', algo_score)
 
             # Logging
-            print(f'Epoch [{epoch:{len(str(num_epochs))}}/{num_epochs}] ended')
+            if epoch % (num_epochs // 50) == 0:
+                print(f'Epoch [{epoch:{len(str(num_epochs))}}/{num_epochs}] ended')
             mean_reward = sum_reward / 2 / num_steps
             self.log('Self | Mean Rew', mean_reward)
 
-            # Training step
-            self.make_step(buffer)
-        
         print('Training finished')

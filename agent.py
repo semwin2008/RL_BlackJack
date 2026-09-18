@@ -5,7 +5,10 @@ class Agent(nn.Module):
     def __init__(self, params):
         super().__init__()
 
-        self.network = nn.Linear(1, 2)
+        self.network = nn.Sequential(
+            # nn.InstanceNorm1d(1),
+            nn.Linear(1, 2),
+        )
         self.activ = nn.Sigmoid()
 
     def forward(self, x):
@@ -28,6 +31,6 @@ class AlgoAgent():
         pass
 
     def act(self, state):
-        if state < 18:
+        if state < 19:
             return 1
         return 0
