@@ -72,15 +72,13 @@ class Trainer():
                 
                 # getting action predictions
                 probs_a, action_b = self.agent(state_a), test_agent.act(state_b)
-                logit_a = torch.zeros_like(probs_a)
                 action_a = torch.multinomial(probs_a, 1)
 
                 # acting
                 reward_a, reward_b = self.env.reflect(action_a, action_b)
                 
                 # computing loss
-                logit_a[action_a] = reward_a
-                loss += torch.sum(-torch.log(probs_a) * logit_a)
+                loss += -torch.log(probs_a)[action_a] * reward_a
 
             loss = loss / num_steps
             loss.backward()

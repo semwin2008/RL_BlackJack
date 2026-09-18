@@ -8,7 +8,7 @@ class Agent(nn.Module):
         self.network = nn.Sequential(
             nn.Linear(1, 2),
         )
-        self.activ = nn.Sigmoid()
+        self.activ = nn.Softmax(dim=-1)
 
     def forward(self, x):
         return self.activ(self.network(x))
