@@ -1,0 +1,8 @@
+agent:
+  width: 1
+
+env:
+  type: "default"
+
+training:
+  exp_length: 32
