@@ -14,7 +14,7 @@ class Agent(nn.Module):
         return self.activ(self.network(x))
 
     def act(self, state):
-        return torch.argmax(self.forward(state))
+        return torch.multinomial(self.forward(state), 1)
 
 
 class RandomAgent():
@@ -22,7 +22,7 @@ class RandomAgent():
         pass
 
     def act(self, state):
-        return torch.randint(1, 2, (1,))
+        return torch.randint(0, 2, (1,))
 
 
 class AlgoAgent():
