@@ -1,3 +1,4 @@
+import torch
 from agent import Agent, RandomAgent, AlgoAgent
 from environment import Environment
 import yaml
@@ -11,7 +12,7 @@ class Trainer():
     def __init__(self, exp_name=None):
 
         # Reading training config
-        with open("config.yaml", "r", encoding="utf-8") as file:
+        with open("params.yaml", "r", encoding="utf-8") as file:
             self.config = yaml.safe_load(file)
         
         print('Configuration file read')
@@ -21,7 +22,7 @@ class Trainer():
         print('Agent instance created')
         
         # creating optimizer
-        self.optim = torch.optim.AdamW(self.agent.parameters(), lr=self.config['train']['lr'])
+        self.optim = torch.optim.AdamW(self.agent.parameters(), lr=float(self.config['train']['lr']))
         print('Agent optimizer created')
 
         # creating environment instance
@@ -44,7 +45,7 @@ class Trainer():
             probs = torch.log(self.agent(state))
             logit = torch.zeros_like(probs)
             logit[action] = reward
-            loss += probs * logit
+            loss += torch.sum(probs * logit)
         loss.backward()
         self.optim.step()
         self.optim.zero_grad()
@@ -79,8 +80,8 @@ class Trainer():
                 sum_reward += reward_a + reward_b
 
             # Validation
-            random_score = validate(RandomAgent())
-            algo_score = validate(AlgoAgent())
+            random_score = self.validate(RandomAgent())
+            algo_score = self.validate(AlgoAgent())
             self.log('Random | Mean Rew', random_score)
             self.log('Algo | Mean Rew', algo_score)
 

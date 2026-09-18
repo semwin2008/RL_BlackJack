@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 class Agent(nn.Module):
-    def __init__(self, **params):
+    def __init__(self, params):
         super().__init__()
 
         self.network = nn.Linear(1, 2)
@@ -12,7 +12,7 @@ class Agent(nn.Module):
         return self.activ(self.network(x))
 
     def act(self, state):
-        return self.forward(state)
+        return torch.argmax(self.forward(state))
 
 
 class RandomAgent():
@@ -20,7 +20,7 @@ class RandomAgent():
         pass
 
     def act(self, state):
-        return torch.random.randint(1, 2, (1,))
+        return torch.randint(1, 2, (1,))
 
 
 class AlgoAgent():

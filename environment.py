@@ -1,4 +1,5 @@
 from random import randint
+import torch
 
 
 class Environment():
@@ -12,17 +13,12 @@ class Environment():
         self.state_b = 0
     
     def get_state(self,):
-        return self.state_a, self.state_b
+        return torch.tensor([self.state_a], dtype=torch.float), torch.tensor([self.state_b], dtype=torch.float)
 
-    def update_state(self, action_a, action_b):
+    def check_game_over(self, action_a, action_b):
         # both players passed or at least one reached threshold => game is over
-        if action_a == 0 and action_b == 0 or \
-            self.state_a >= self.threshold or self.state_b >= self.threshold:
-            yield True
-            self.state_a = 0
-            self.state_b = 0
-            return None
-        yield False
+        return action_a == 0 and action_b == 0 or \
+            self.state_a >= self.threshold or self.state_b >= self.threshold
     
     def sample(self,) -> int:
         return randint(1, self.max_value)
@@ -43,8 +39,7 @@ class Environment():
             self.state_b += self.sample()
         
         # checking if game is over
-        call = update_state(action_a, action_b)
-        if next(call):
+        if self.check_game_over(action_a, action_b):
             winner_num = self.winner_num()
             if self.state_a == winner_num and self.state_b == winner_num:
                 reward_a, reward_b = 0, 0
@@ -52,9 +47,10 @@ class Environment():
                 reward_a, reward_b = 1, -1
             else:
                 reward_a, reward_b = -1, 1
+            
+            self.state_a = 0
+            self.state_b = 0
         else:
             reward_a, reward_b = 0, 0
-        # updating states if game is over
-        next(call)
 
         return reward_a, reward_b
