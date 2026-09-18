@@ -1,11 +1,14 @@
 from agent import Agent
 from environment import Environment
 import yaml
+from tensorboardX import SummaryWriter
+import datetime
 
+
+LOGDIR = './.logs/'
 
 class Trainer():
     def __init__(self, exp_name=None):
-        self.exp_name = exp_name or ''
 
         # Reading training config
         with open("config.yaml", "r", encoding="utf-8") as file:
@@ -21,9 +24,38 @@ class Trainer():
         self.env = Environment()
         print('Environment instance created')
 
+        # creating logging env
+        timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        exp_name = exp_name or f'experiment-{timestamp}'
+        self.writer = SummaryWriter(LOGDIR + exp_name)
 
-    def log(self,):
+    def log(self, metric, value):
+        self.writer.add_scalar(metric, value)
+
+    def make_step(self, data):
         pass
     
     def train(self,):
-        pass
+        num_epochs = self.config['train']['num_epochs']
+        for epoch in range(num_epochs):
+            buffer = []
+            sum_reward = 0
+            num_steps = self.config['train']['num_steps']
+
+            # Experience loop
+            for step in range(num_steps):
+                state_a, state_b = self.env.get_state()
+                action_a, action_b = self.agent.act(state_a), self.agent.act(state_b)
+                reward_a, reward_b = self.env.reflect(action_a, action_b)
+                buffer.append((state_a, action_a, reward_a))
+                buffer.append((state_b, action_b, reward_b))
+                sum_reward += reward_a + reward_b
+            
+            # Logging
+            print(f'Epoch [{epoch:{len(str(num_epochs))}}/{num_epochs}] ended')
+            mean_reward = sum_reward / 2 / num_steps
+            self.log('Mean Reward', mean_reward)
+
+            # Training step
+            self.make_step(buffer)
+

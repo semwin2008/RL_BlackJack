@@ -10,6 +10,9 @@ class Environment():
         self.max_value = max_value
         self.state_a = 0
         self.state_b = 0
+    
+    def get_state(self,):
+        return self.state_a, self.state_b
 
     def update_state(self, action_a, action_b):
         # both players passed or at least one reached threshold => game is over
@@ -49,6 +52,9 @@ class Environment():
                 reward_a, reward_b = 1, -1
             else:
                 reward_a, reward_b = -1, 1
-        
+        else:
+            reward_a, reward_b = 0, 0
         # updating states if game is over
         next(call)
+
+        return reward_a, reward_b
