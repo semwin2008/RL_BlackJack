@@ -67,6 +67,7 @@ class Trainer():
 
             # Training loop
             loss = 0
+            experince = []
             for step in range(num_steps):
                 state_a, state_b = self.env.get_state()
                 
@@ -76,10 +77,21 @@ class Trainer():
 
                 # acting
                 reward_a, reward_b = self.env.reflect(action_a, action_b)
-                
-                # computing loss
-                loss += -torch.log(probs_a)[action_a] * reward_a
+                sum_reward += reward_a
 
+                # storing experience
+                experince.append([state_a, action_a, reward_a])
+            
+            # Discounting rewards and calculating loss
+            for i in range(num_steps - 2, -1, -1):
+                state, action, reward = experince[i]
+                # if game is not in the beggining state, we add discounted reward from the next step
+                if not self.env.is_initial_state(state):
+                    reward += experince[i + 1][2] * self.config['train']['gamma']
+                # computing loss for the step
+                loss += -torch.log(self.agent(state)[action]) * reward
+            
+            # Optimizing
             loss = loss / num_steps
             loss.backward()
             self.optim.step()

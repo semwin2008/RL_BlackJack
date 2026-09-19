@@ -29,7 +29,9 @@ class Environment():
         if self.state_a == self.threshold or self.state_b == self.threshold:
             return self.threshold
         return min(self.state_a, self.state_b)
-        
+    
+    def is_initial_state(self, state):
+        return state == 0
 
     def reflect(self, action_a, action_b):
         # acting

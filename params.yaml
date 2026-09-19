@@ -10,6 +10,7 @@ train:
   num_epochs: 5000
   num_steps: 256
   lr: 1e-4
+  gamma: 0.95
 
 valid:
   num_steps: 1024
