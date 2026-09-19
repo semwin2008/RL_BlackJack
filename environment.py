@@ -6,6 +6,7 @@ class Environment():
     def __init__(self, 
         threshold=21,
         max_value=10,
+        **kwargs,
     ):
         self.threshold = threshold
         self.max_value = max_value

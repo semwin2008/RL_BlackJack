@@ -46,7 +46,7 @@ class Trainer():
 
 
     def validate(self, test_agent) -> float:
-        test_env = Environment()
+        test_env = Environment(**self.config['env'])
 
         num_steps = self.config['valid']['num_steps']
         sum_reward = 0
@@ -65,7 +65,7 @@ class Trainer():
             sum_reward = 0
             num_steps = self.config['train']['num_steps']
 
-            # Training loop
+            # Experience loop
             loss = 0
             experince = []
             for step in range(num_steps):
