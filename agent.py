@@ -6,11 +6,11 @@ class Agent(nn.Module):
         super().__init__()
 
         self.network = nn.Sequential(
-            nn.Linear(1, 64),
+            nn.Linear(1, 32),
             nn.LeakyReLU(inplace=True),
-            nn.Linear(64, 64),
+            nn.Linear(32, 32),
             nn.LeakyReLU(inplace=True),
-            nn.Linear(64, 2),
+            nn.Linear(32, 2),
         )
         self.activ = nn.Softmax(dim=-1)
 

@@ -1,4 +1,4 @@
-from random import randint
+from numpy import random
 import torch
 
 
@@ -21,10 +21,10 @@ class Environment():
         return action_a == 0 and action_b == 0 or \
             self.state_a >= self.threshold or self.state_b >= self.threshold
     
-    def sample(self,) -> int:
-        return randint(1, self.max_value)
+    def sample(self,) -> float:
+        return (random.randn() + self.max_value / 2) * self.max_value / 5
     
-    def winner_num(self,) -> int:
+    def winner_num(self,) -> float:
         if self.state_a < self.threshold and self.state_b < self.threshold:
             return max(self.state_a, self.state_b)
         if self.state_a == self.threshold or self.state_b == self.threshold:
