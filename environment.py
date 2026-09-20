@@ -68,12 +68,12 @@ class Environment():
         input_b = torch.tensor([*self.state_b, self.state_a.hp], dtype=torch.float)
         return input_a, input_b
 
-    def check_game_over(self, action_a, action_b):
+    def check_game_over(self,):
         # one of the players killed another
         return self.state_a.hp <= 0 or self.state_b.hp <= 0
     
     def sample(self,) -> float:
-        return random.randn() * self.bomb_power
+        return random.rand() * self.bomb_power
     
     def is_initial_state(self, state):
         return state == State()
@@ -102,26 +102,26 @@ class Environment():
         
         # bomb
         if action_a == 3:
-            if self.state_a.bomb(self.bomb_power, self.step):
-                self.state_b.bombed(self.bomb_power)
+            if self.state_a.bomb(self.sample(), self.step):
+                self.state_b.bombed(self.sample())
         if action_b == 3:
-            if self.state_b.bomb(self.bomb_power, self.step):
-                self.state_a.bombed(self.bomb_power)
+            if self.state_b.bomb(self.sample(), self.step):
+                self.state_a.bombed(self.sample())
 
         # Rewarding
         if self.state_a.is_finite() and self.state_b.is_finite():
             self.state_a = State()
             self.state_b = State()
-            return 0, 0
+            return 0, 0, 1
         
         if self.state_a.is_finite():
             self.state_a = State()
             self.state_b = State()
-            return -1, 1
+            return -1, 1, 1
         
         if self.state_b.is_finite():
             self.state_a = State()
             self.state_b = State()
-            return 1, -1
+            return 1, -1, 1
 
-        return 0, 0
+        return 0, 0, 1

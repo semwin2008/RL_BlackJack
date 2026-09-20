@@ -39,28 +39,23 @@ class Trainer():
     def log(self, metric, value):
         self.writer.add_scalar(metric, value)
 
-    def make_step(self, data):
-        loss = 0
-        for state, action, reward in data:
-            probs = torch.log(self.agent(state))
-
-
     def validate(self, test_agent) -> float:
         test_env = Environment(**self.config['env'])
 
         num_steps = self.config['valid']['num_steps']
         sum_reward = 0
+        starts = 0
         for i in range(num_steps):
             state_a, state_b = test_env.get_state()
             action_a, action_b = self.agent.act(state_a), test_agent.act(state_b)
             reward_a, reward_b = test_env.reflect(action_a, action_b)
             sum_reward += reward_a
-        
+            restarts += test_env.check_game_over()
         return sum_reward / num_steps
 
     def train(self,):
         num_epochs = self.config['train']['num_epochs']
-        test_agent = RandomAgent()
+        test_agent = AlgoAgent()
         for epoch in range(num_epochs):
             sum_reward = 0
             num_steps = self.config['train']['num_steps']
@@ -72,7 +67,7 @@ class Trainer():
                 state_a, state_b = self.env.get_state()
                 
                 # getting action predictions
-                probs_a, action_b = self.agent(state_a), test_agent.act(state_b)
+                probs_a, action_b = self.agent(state_a, train=(step==0)), test_agent.act(state_b)
                 action_a = torch.multinomial(probs_a, 1)
 
                 # acting

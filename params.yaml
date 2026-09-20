@@ -1,5 +1,6 @@
 agent:
-  width: 1
+  temp: 2
+  step: 0.9996
 
 env:
   step: 0.1
@@ -9,7 +10,7 @@ train:
   num_epochs: 5000
   num_steps: 256
   lr: 1e-4
-  gamma: 0.95
+  gamma: 0.98
 
 valid:
-  num_steps: 1024
+  num_steps: 512
