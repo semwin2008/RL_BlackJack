@@ -26,7 +26,7 @@ class Trainer():
         print('Agent optimizer created')
 
         # creating environment instance
-        self.env = Environment()
+        self.env = Environment(**self.config['env'])
         print('Environment instance created')
 
         # creating logging env

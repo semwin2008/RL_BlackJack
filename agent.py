@@ -6,16 +6,16 @@ class Agent(nn.Module):
         super().__init__()
 
         self.network = nn.Sequential(
-            nn.Linear(1, 32),
+            nn.Linear(4, 64),
             nn.LeakyReLU(inplace=True),
-            nn.Linear(32, 32),
+            nn.Linear(64, 64),
             nn.LeakyReLU(inplace=True),
-            nn.Linear(32, 2),
+            nn.Linear(64, 4),
         )
         self.activ = nn.Softmax(dim=-1)
 
     def forward(self, x):
-        return self.activ(self.network(x / 21))
+        return self.activ(self.network(x))
 
     def act(self, state):
         return torch.multinomial(self.forward(state), 1)
@@ -26,7 +26,7 @@ class RandomAgent():
         pass
 
     def act(self, state):
-        return torch.randint(0, 2, (1,))
+        return torch.randint(0, 4, (1,))
 
 
 class AlgoAgent():
@@ -34,6 +34,4 @@ class AlgoAgent():
         pass
 
     def act(self, state):
-        if state < 19:
-            return 1
-        return 0
+        pass

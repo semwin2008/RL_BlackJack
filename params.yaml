@@ -2,9 +2,8 @@ agent:
   width: 1
 
 env:
-  type: "default"
-  threshold: 21
-  max_value: 10
+  step: 0.1
+  bomb_power: 0.2
 
 train:
   num_epochs: 5000
