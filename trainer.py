@@ -48,10 +48,10 @@ class Trainer():
         for i in range(num_steps):
             state_a, state_b = test_env.get_state()
             action_a, action_b = self.agent.act(state_a), test_agent.act(state_b)
-            reward_a, reward_b = test_env.reflect(action_a, action_b)
+            reward_a, reward_b, finished = test_env.reflect(action_a, action_b)
             sum_reward += reward_a
-            restarts += test_env.check_game_over()
-        return sum_reward / num_steps
+            starts += finished
+        return sum_reward / starts
 
     def train(self,):
         num_epochs = self.config['train']['num_epochs']
@@ -71,17 +71,17 @@ class Trainer():
                 action_a = torch.multinomial(probs_a, 1)
 
                 # acting
-                reward_a, reward_b = self.env.reflect(action_a, action_b)
+                reward_a, reward_b, finished = self.env.reflect(action_a, action_b)
                 sum_reward += reward_a
 
                 # storing experience
-                experince.append([state_a, action_a, reward_a])
+                experince.append([state_a, action_a, reward_a, finished])
             
             # Discounting rewards and calculating loss
             for i in range(num_steps - 2, -1, -1):
-                state, action, reward = experince[i]
+                state, action, reward, finished = experince[i]
                 # if game is not in the beggining state, we add discounted reward from the next step
-                if not self.env.is_initial_state(state):
+                if not finished:
                     reward += experince[i + 1][2] * self.config['train']['gamma']
                 # computing loss for the step
                 loss += -torch.log(self.agent(state)[action]) * reward
