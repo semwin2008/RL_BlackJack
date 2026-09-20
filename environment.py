@@ -8,29 +8,29 @@ class State():
         self.st = stamina
         self.mp = mp
     
-    def stay(step):
-        self.mp += step1222
+    def stay(self, step):
+        self.mp += step
         self.st += step
         return True
 
-    def heal(step):
+    def heal(self, step):
         if self.mp < step:
             return False
         self.hp += step
         self.mp -= step
         return True
     
-    def attack(step):
+    def attack(self, step):
         if self.st < step:
             return False
         self.st -= step
         return True
     
-    def attacked(step):
+    def attacked(self, step):
         self.hp -= 2 * step
         return True
     
-    def bomb(damage, step):
+    def bomb(self, damage, step):
         if self.st < step or self.mp < 2 * step:
             return False
         self.st -= step
@@ -38,11 +38,11 @@ class State():
         self.hp -= damage
         return True
     
-    def bombed(damage):
+    def bombed(self, damage):
         self.hp -= 2 * damage
         return True
     
-    def is_finite():
+    def is_finite(self,):
         return self.hp <= 0
     
     def __iter__(self,):
@@ -54,7 +54,7 @@ class State():
 class Environment():
     def __init__(self, 
         step=1e-1,
-        bomb_power=2e-1
+        bomb_power=2e-1,
         **kwargs,
     ):
         self.step = step
@@ -66,7 +66,7 @@ class Environment():
         # Each player knows their own state and opponent's hp
         input_a = torch.tensor([*self.state_a, self.state_b.hp], dtype=torch.float)
         input_b = torch.tensor([*self.state_b, self.state_a.hp], dtype=torch.float)
-        return a, b
+        return input_a, input_b
 
     def check_game_over(self, action_a, action_b):
         # one of the players killed another
@@ -82,38 +82,46 @@ class Environment():
         # Acting
         # stay
         if action_a == 0:
-            self.state_a.stay()
+            self.state_a.stay(self.step)
         if action_b == 0:
-            self.state_b.stay()
+            self.state_b.stay(self.step)
         
         # heal
         if action_a == 1:
-            self.state_a.heal()
+            self.state_a.heal(self.step)
         if action_b == 1:
-            self.state_b.heal()
+            self.state_b.heal(self.step)
         
         # attack
         if action_a == 2:
-            if self.state_a.attack():
-                self.state_b.attacked()
+            if self.state_a.attack(self.step):
+                self.state_b.attacked(self.step)
         if action_b == 2:
-            if self.state_b.attack():
-                self.state_a.attacked()
+            if self.state_b.attack(self.step):
+                self.state_a.attacked(self.step)
         
         # bomb
         if action_a == 3:
-            if self.state_a.bomb():
-                self.state_b.bombed()
+            if self.state_a.bomb(self.bomb_power, self.step):
+                self.state_b.bombed(self.bomb_power)
         if action_b == 3:
-            if self.state_b.bomb():
-                self.state_a.bombed()
+            if self.state_b.bomb(self.bomb_power, self.step):
+                self.state_a.bombed(self.bomb_power)
 
         # Rewarding
-        if state_a.is_finite() and state_b.is_finite():
+        if self.state_a.is_finite() and self.state_b.is_finite():
+            self.state_a = State()
+            self.state_b = State()
             return 0, 0
         
-        if state_a.is_finite():
+        if self.state_a.is_finite():
+            self.state_a = State()
+            self.state_b = State()
             return -1, 1
         
-        if state_b.is_finite():
+        if self.state_b.is_finite():
+            self.state_a = State()
+            self.state_b = State()
             return 1, -1
+
+        return 0, 0

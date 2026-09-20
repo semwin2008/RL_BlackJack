@@ -60,7 +60,7 @@ class Trainer():
 
     def train(self,):
         num_epochs = self.config['train']['num_epochs']
-        test_agent = AlgoAgent()
+        test_agent = RandomAgent()
         for epoch in range(num_epochs):
             sum_reward = 0
             num_steps = self.config['train']['num_steps']
